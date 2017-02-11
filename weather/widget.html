@@ -1,0 +1,98 @@
+<html>
+<head>
+	<title>Live Weather from Saltwater-Recon</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrapper">
+	<div id="weather"></div>
+</div>
+
+<script
+  src="https://code.jquery.com/jquery-1.12.4.min.js"
+  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.simpleWeather/3.1.0/jquery.simpleWeather.min.js"></script>
+
+
+<script> 
+
+var App = function() {
+	var _Root = this;
+
+	this.feedUrl = 'http://96.83.52.50/axis-cgi/jpg/image.cgi?resolution=704x480';
+	
+	this.location = undefined;
+
+	this.dom = {
+		feed: '#feed',
+		weather: '#weather'
+	}
+
+	this._getParameterByName = function(name) {
+	     var url = window.location.href;
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
+	}
+
+	this.refreshImage = function() {
+		var d = new Date();
+		var url =  _Root.feedUrl + '&cb=' + d.getTime();
+		console.log('refresh', url);
+		// $(_Root.dom.feed).html('<img src="' + url + '">');
+		$('body').css({'background-image': 'url(' + url + ')'});
+	}
+
+	this.init = function() {
+		this.refreshImage();
+
+		var refreshTime = this._getParameterByName('refresh') ? this._getParameterByName('refresh') * 1000 : 30000;
+
+		var imageRefreshInt = setInterval(function(){
+			_Root.refreshImage();
+		}, refreshTime);
+
+		this.location = this._getParameterByName('location') ? this._getParameterByName('location') : 'Austin, Tx';
+
+
+		if ( _Root._getParameterByName('position') ) {
+			var position = _Root._getParameterByName('position');
+			var pos = 'center';
+			if ( position == 'top' ) {
+				pos = 'flex-start';
+			} else if (position == 'bottom') {
+				pos = 'flex-end';
+			}
+
+			$('.wrapper').css({'align-items': pos});
+		}
+
+	  $.simpleWeather({
+	    location: _Root.location,
+	    woeid: '',
+	    unit: 'f',
+	    success: function(weather) {
+	      html = '<h2><i class="icon-'+weather.code+'"></i> '+weather.temp+'&deg;'+weather.units.temp+'</h2>';
+	      html += '<ul><li>'+weather.city+', '+weather.region+'</li>';
+	      html += '<li class="currently">'+weather.currently+'</li>';
+	      html += '<li>'+weather.wind.direction+' '+weather.wind.speed+' '+weather.units.speed+'</li></ul>';
+	  
+	      $(_Root.dom.weather).html(html);
+	    },
+	    error: function(error) {
+	      $(_Root.dom.weather).html('<p>'+error+'</p>');
+	    }
+	  });
+	}
+
+	this.init()
+}
+
+var app = new App();
+</script>
+</body>
+</html>
