@@ -9,11 +9,11 @@ function createFileInput(options) {
 	var input = document.createElement("input")
 	input.setAttribute("type", "file")
 
-	Object.keys(options).forEach(key => {
+	Object.keys(options).forEach(function(key) {
 		if (key !== "events") {
 			input.setAttribute(key, options[key])
 		} else {
-			Object.keys(options.events).forEach(eventKey => {
+			Object.keys(options.events).forEach(function(eventKey) {
 				input.addEventListener(eventKey, options.events[eventKey])
 			})
 		}
