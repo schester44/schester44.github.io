@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<script>
+function createFileInput(options) {
+	var input = document.createElement("input")
+	input.setAttribute("type", "file")
+
+	Object.keys(options).forEach(key => {
+		if (key !== "events") {
+			input.setAttribute(key, options[key])
+		} else {
+			Object.keys(options.events).forEach(eventKey => {
+				input.addEventListener(eventKey, options.events[eventKey])
+			})
+		}
+	})
+
+	return input
+}
+
+function openInput() {
+
+	var input = createFileInput({
+		accept: "image/*",
+		events: {
+			change: function() {
+				document.getElementById("test").innerHTML = "File works, file selected"
+			}
+		}
+	})
+
+	document.getElementById('test').innerHTML = 'Input Clicked'
+	input.click()
+}
+
+	</script>
+</head>
+<body>
+
+	<button onclick="openInput()">Open File Input</button>
+	<div id="test"></div>
+</body>
+</html>
